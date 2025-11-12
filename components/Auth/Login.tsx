@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import LoadingSpinner from '../LoadingSpinner';
+import { GoogleIcon } from '../icons';
 
 interface LoginProps {
   onSuccess: () => void;
@@ -12,6 +13,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -20,21 +22,40 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     setLoading(true);
     setError(null);
 
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else if (data.user) {
+      onSuccess();
+    } else {
+      // Caso de sucesso, mas sem usuário (ex: confirmação de email pendente)
+      setError('Verifique seu email para confirmar o login.');
+    }
+    setLoading(false);
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    setError(null);
+
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin, // Redireciona de volta para a URL atual
+        },
       });
 
       if (error) throw error;
-
-      if (data.user) {
-        onSuccess();
-      }
-    } catch (error: any) {
-      setError(error.message || 'Erro ao fazer login');
-    } finally {
-      setLoading(false);
+      // O sucesso é tratado pelo onAuthStateChange no AuthContext
+    } catch (error) {
+      const errorMessage = (error as any).message || 'Erro ao fazer login com Google';
+      setError(errorMessage);
+      setIsGoogleLoading(false);
     }
   };
 
@@ -44,28 +65,25 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     setError(null);
     setMessage(null);
 
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
         },
-      });
+      },
+    });
 
-      if (error) throw error;
-
+    if (error) {
+      setError(error.message);
+    } else {
       setMessage('Cadastro realizado! Verifique seu email para confirmar a conta.');
       setEmail('');
       setPassword('');
       setFullName('');
-    } catch (error: any) {
-      setError(error.message || 'Erro ao criar conta');
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (
@@ -87,7 +105,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
         </div>
 
         {/* Card de Login/Cadastro */}
-        <div className="bg-white dark:bg-dark-card rounded-xl shadow-popover p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-popover p-8 border border-gray-200 dark:border-gray-700">
           {/* Tabs */}
           <div className="flex gap-2 mb-6">
             <button
@@ -185,21 +203,47 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
               )}
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <LoadingSpinner size="sm" />
-                  <span>Processando...</span>
-                </>
-              ) : (
-                <span>{isLogin ? 'Entrar' : 'Criar Conta'}</span>
-              )}
-            </button>
-          </form>
+	            <button
+	              type="submit"
+	              disabled={loading}
+	              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+	            >
+	              {loading ? (
+	                <>
+	                  <LoadingSpinner size="sm" />
+	                  <span>Processando...</span>
+	                </>
+	              ) : (
+	                <span>{isLogin ? 'Entrar' : 'Criar Conta'}</span>
+	              )}
+	            </button>
+	          </form>
+
+	          {/* Separador */}
+	          <div className="flex items-center my-6">
+	            <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+	            <span className="flex-shrink mx-4 text-gray-500 dark:text-gray-400 text-sm">OU</span>
+	            <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
+	          </div>
+
+	          {/* Botão de Login com Google */}
+	          <button
+	            onClick={handleGoogleLogin}
+	            disabled={isGoogleLoading}
+	            className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+	          >
+	            {isGoogleLoading ? (
+	              <>
+	                <LoadingSpinner size="sm" />
+	                <span>Redirecionando...</span>
+	              </>
+	            ) : (
+	              <>
+	                <GoogleIcon className="w-5 h-5" />
+	                <span>Continuar com Google</span>
+	              </>
+	            )}
+	          </button>
 
           {/* Link de recuperação de senha */}
           {isLogin && (
