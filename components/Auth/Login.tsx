@@ -42,21 +42,19 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     setIsGoogleLoading(true);
     setError(null);
 
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin, // Redireciona de volta para a URL atual
-        },
-      });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin, // Redireciona de volta para a URL atual
+      },
+    });
 
-      if (error) throw error;
-      // O sucesso é tratado pelo onAuthStateChange no AuthContext
-    } catch (error) {
-      const errorMessage = (error as any).message || 'Erro ao fazer login com Google';
-      setError(errorMessage);
-      setIsGoogleLoading(false);
+    if (error) {
+      setError(error.message);
     }
+    // O sucesso é tratado pelo onAuthStateChange no AuthContext
+    // Não precisamos de setIsGoogleLoading(false) aqui, pois o fluxo de OAuth
+    // redireciona o usuário para fora da página.
   };
 
   const handleSignup = async (e: React.FormEvent) => {
