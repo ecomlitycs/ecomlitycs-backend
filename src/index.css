@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', 'Poppins', system-ui, -apple-system, Segoe UI, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .hover-zoom {
+    @apply transition-all duration-200;
+  }
+  
+  .hover-zoom:hover {
+    @apply -translate-y-1 shadow-card-hover;
+  }
+  
+  .card-professional {
+    @apply bg-white dark:bg-dark-card rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300;
+  }
+  
+  .btn-primary {
+    @apply bg-primary hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition-all duration-200 hover:scale-105 active:scale-95;
+  }
+  
+  .skeleton {
+    @apply bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700;
+    background-size: 1000px 100%;
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
