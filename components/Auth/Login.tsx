@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import LoadingSpinner from '../LoadingSpinner';
-import { GoogleIcon } from '../icons';
+
 
 interface LoginProps {
   onSuccess: () => void;
@@ -13,7 +13,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -38,24 +38,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
     setLoading(false);
   };
 
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    setError(null);
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin, // Redireciona de volta para a URL atual
-      },
-    });
-
-    if (error) {
-      setError(error.message);
-    }
-    // O sucesso é tratado pelo onAuthStateChange no AuthContext
-    // Não precisamos de setIsGoogleLoading(false) aqui, pois o fluxo de OAuth
-    // redireciona o usuário para fora da página.
-  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,31 +200,7 @@ const Login: React.FC<LoginProps> = ({ onSuccess }) => {
 	            </button>
 	          </form>
 
-	          {/* Separador */}
-	          <div className="flex items-center my-6">
-	            <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-	            <span className="flex-shrink mx-4 text-gray-500 dark:text-gray-400 text-sm">OU</span>
-	            <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-	          </div>
 
-	          {/* Botão de Login com Google */}
-	          <button
-	            onClick={handleGoogleLogin}
-	            disabled={isGoogleLoading}
-	            className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-	          >
-	            {isGoogleLoading ? (
-	              <>
-	                <LoadingSpinner size="sm" />
-	                <span>Redirecionando...</span>
-	              </>
-	            ) : (
-	              <>
-	                <GoogleIcon className="w-5 h-5" />
-	                <span>Continuar com Google</span>
-	              </>
-	            )}
-	          </button>
 
           {/* Link de recuperação de senha */}
           {isLogin && (
