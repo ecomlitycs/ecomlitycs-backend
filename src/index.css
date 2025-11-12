@@ -22,9 +22,13 @@
   .card-professional {
     @apply bg-white dark:bg-dark-card rounded-lg shadow-card hover:shadow-card-hover transition-all duration-300;
   }
+  /* Ajuste para o modo escuro, usando as novas cores */
+  .dark {
+    @apply bg-dark-background text-dark-text;
+  }
   
   .btn-primary {
-    @apply bg-primary hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition-all duration-200 hover:scale-105 active:scale-95;
+    @apply bg-primary hover:bg-primary-hover text-white font-medium px-4 py-2 rounded-md transition-all duration-200 hover:scale-105 active:scale-95;
   }
   
   .skeleton {

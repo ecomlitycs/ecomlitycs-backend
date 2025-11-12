@@ -11,6 +11,27 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      colors: {
+        primary: {
+          DEFAULT: '#3B82F6', // blue-500
+          hover: '#2563EB', // blue-600
+          focus: '#1D4ED8', // blue-700
+        },
+        secondary: {
+          DEFAULT: '#6B7280', // gray-500
+          hover: '#4B5563', // gray-600
+        },
+        dark: {
+          background: '#111827', // gray-900
+          card: '#1F2937',      // gray-800
+          border: '#374151',    // gray-700
+          text: '#F9FAFB',      // gray-50
+          'text-secondary': '#9CA3AF', // gray-400
+        },
+        success: '#10B981',
+        danger: '#EF4444',
+        warning: '#F59E0B',
+      },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
         headings: ['Poppins', 'sans-serif'],

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { 
     DatabaseIcon,
     TargetIcon, DollarSignIcon, ChartBarIcon, SettingsIcon, FileIcon, 
-    PieChartIcon, ChartIcon, WalletIcon, ChevronDownIcon, CompassIcon
+    PieChartIcon, ChartIcon, WalletIcon, ChevronDownIcon, CompassIcon, LogOutIcon // Adicionando LogOutIcon
 } from './icons';
+import { useAuth } from '../../contexts/AuthContext'; // Importando useAuth
 
 type ActiveTab = 'dashboard' | 'control_panel' | 'planning' | 'annual_planning' | 'pricing' | 'tracking' | 'reports' | 'data' | 'settings';
 
@@ -47,6 +48,7 @@ const NavItem: React.FC<{
 const Sidebar: React.FC<SidebarProps> = ({ 
   activeTab, setActiveTab, isMobileOpen, setIsMobileOpen
 }) => {
+  const { signOut } = useAuth(); // Usando o hook de autenticação
 
   const mainNavItems: NavItemSpec[] = [
     { id: 'dashboard', label: 'Financeiro', icon: <ChartIcon /> },
@@ -144,10 +146,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             </nav>
 
             <div className="mt-auto p-3 border-t border-border/50 dark:border-dark-border/50 space-y-1">
-                 {bottomNavItems.map((item) => (
-                    <NavItem key={item.id} {...item} isActive={activeTab === item.id} onClick={handleNavClick} />
-                ))}
-            </div>
+	                 {bottomNavItems.map((item) => (
+	                    <NavItem key={item.id} {...item} isActive={activeTab === item.id} onClick={handleNavClick} />
+	                ))}
+	                {/* Botão de Logout */}
+	                <button
+	                    onClick={signOut}
+	                    className="w-full flex items-center py-2.5 px-3 rounded-md text-left transition-all duration-200 group space-x-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium"
+	                >
+	                    <span className="flex-shrink-0 w-5 h-5 text-red-600 dark:text-red-400">
+	                        <LogOutIcon />
+	                    </span>
+	                    <span className="whitespace-nowrap text-sm">Sair</span>
+	                </button>
+	            </div>
         </div>
       </aside>
     </>
